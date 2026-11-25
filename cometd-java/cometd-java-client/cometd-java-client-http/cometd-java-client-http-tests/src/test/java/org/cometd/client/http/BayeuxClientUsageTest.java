@@ -59,7 +59,7 @@ public class BayeuxClientUsageTest extends ClientServerTest {
         context.addServlet(proxyServlet, "/*");
 
         proxy.start();
-        httpClient.getProxyConfiguration().getProxies().add(new HttpProxy("localhost", proxyConnector.getLocalPort()));
+        httpClient.getProxyConfiguration().addProxy(new HttpProxy("localhost", proxyConnector.getLocalPort()));
 
         testClient(newBayeuxClient());
     }
@@ -92,7 +92,7 @@ public class BayeuxClientUsageTest extends ClientServerTest {
         sslServer.setKeyStorePassword("storepwd");
         clientConnector.setSslContextFactory(sslClient);
         httpClient = new HttpClient(new HttpClientTransportOverHTTP(clientConnector));
-        httpClient.getProxyConfiguration().getProxies().add(new HttpProxy("localhost", proxyConnector.getLocalPort()));
+        httpClient.getProxyConfiguration().addProxy(new HttpProxy("localhost", proxyConnector.getLocalPort()));
         httpClient.start();
 
         String url = "https://localhost:" + sslConnector.getLocalPort() + cometdServletPath;
