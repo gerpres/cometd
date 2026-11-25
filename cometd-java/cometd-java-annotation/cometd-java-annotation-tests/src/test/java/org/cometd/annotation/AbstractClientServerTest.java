@@ -47,7 +47,7 @@ public abstract class AbstractClientServerTest {
         connector.setIdleTimeout(30000);
         server.addConnector(connector);
 
-        ServletContextHandler context = new ServletContextHandler(server, "/");
+        ServletContextHandler context = new ServletContextHandler(server, "/", ServletContextHandler.SESSIONS);
 
         // CometD servlet
         ServletHolder cometdServletHolder = new ServletHolder(CometDServlet.class);

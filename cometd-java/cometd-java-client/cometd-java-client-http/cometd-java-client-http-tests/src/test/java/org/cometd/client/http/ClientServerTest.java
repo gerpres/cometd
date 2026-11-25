@@ -59,7 +59,7 @@ public abstract class ClientServerTest {
         connector.setIdleTimeout(30000);
         server.addConnector(connector);
 
-        context = new ServletContextHandler(server, "/");
+        context = new ServletContextHandler(server, "/", ServletContextHandler.SESSIONS);
 
         // CometD servlet
         ServletHolder cometdServletHolder = new ServletHolder(CometDServlet.class);

@@ -78,7 +78,7 @@ public class WebSocketTransportTest {
         connector = new ServerConnector(server);
         server.addConnector(connector);
 
-        ServletContextHandler context = new ServletContextHandler(server, "/");
+        ServletContextHandler context = new ServletContextHandler(server, "/", ServletContextHandler.SESSIONS);
         JavaxWebSocketServletContainerInitializer.configure(context, null);
 
         String cometdURLMapping = "/cometd/*";

@@ -74,7 +74,7 @@ public class BayeuxServerJMXTest
         MBeanContainer mbeanContainer = new MBeanContainer(mbeanServer);
         server.addBean(mbeanContainer);
 
-        ServletContextHandler context = new ServletContextHandler(server, "/");
+        ServletContextHandler context = new ServletContextHandler(server, "/", ServletContextHandler.SESSIONS);
 
         // CometD servlet
         String cometdServletPath = "/cometd";

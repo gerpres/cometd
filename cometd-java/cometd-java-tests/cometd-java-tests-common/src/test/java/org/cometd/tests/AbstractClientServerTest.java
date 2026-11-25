@@ -93,7 +93,7 @@ public abstract class AbstractClientServerTest {
         connector.setIdleTimeout(30000);
         server.addConnector(connector);
 
-        context = new ServletContextHandler(server, "/");
+        context = new ServletContextHandler(server, "/", ServletContextHandler.SESSIONS);
         configure(transport, context);
 
         switch (transport) {
