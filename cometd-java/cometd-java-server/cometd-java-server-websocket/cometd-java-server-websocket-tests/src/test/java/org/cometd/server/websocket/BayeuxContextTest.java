@@ -232,12 +232,12 @@ public class BayeuxContextTest extends ClientServerWebSocketTest {
                 .send();
         Assertions.assertEquals(200, response.getStatus());
 
-        List<HttpCookie> cookies = httpClient.getCookieStore().get(uri);
+        List<org.eclipse.jetty.http.HttpCookie> cookies = httpClient.getHttpCookieStore().match(uri);
         Assertions.assertNotNull(cookies);
         HttpCookie sessionCookie = null;
-        for (HttpCookie cookie : cookies) {
+        for (org.eclipse.jetty.http.HttpCookie cookie : cookies) {
             if ("jsessionid".equalsIgnoreCase(cookie.getName())) {
-                sessionCookie = cookie;
+                sessionCookie = org.eclipse.jetty.http.HttpCookie.asJavaNetHttpCookie(cookie);
             }
         }
         Assertions.assertNotNull(sessionCookie);

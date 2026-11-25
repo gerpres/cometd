@@ -53,7 +53,7 @@ import org.eclipse.jetty.websocket.core.Frame;
 import org.eclipse.jetty.websocket.core.OpCode;
 import org.eclipse.jetty.websocket.core.internal.Generator;
 import org.eclipse.jetty.websocket.core.internal.Parser;
-import org.eclipse.jetty.websocket.core.internal.WebSocketCore;
+import org.eclipse.jetty.websocket.core.util.WebSocketUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -229,7 +229,7 @@ public class NetworkDelayListenerTest extends AbstractClientServerTest {
             parser.parseNext(buffer);
         }
 
-        String key = WebSocketCore.hashKey(hsRequest.get(HttpHeader.SEC_WEBSOCKET_KEY));
+        String key = WebSocketUtils.hashKey(hsRequest.get(HttpHeader.SEC_WEBSOCKET_KEY));
         String response = "" +
                 "HTTP/1.1 101 Switching Protocols\r\n" +
                 "Upgrade: websocket\r\n" +
@@ -250,7 +250,7 @@ public class NetworkDelayListenerTest extends AbstractClientServerTest {
 
     private ServerMessage receiveWebSocketMessage(SocketChannel socket, ByteBuffer buffer, JSONContextServer json) throws Exception {
         Parser parser = new Parser(new ArrayByteBufferPool());
-        Parser.ParsedFrame frame;
+        Frame.Parsed frame;
         while (true) {
             frame = parser.parse(buffer);
             if (frame != null) {
@@ -260,7 +260,9 @@ public class NetworkDelayListenerTest extends AbstractClientServerTest {
             socket.read(buffer);
             buffer.flip();
         }
-        return json.parse(BufferUtil.toString(frame.getPayload(), StandardCharsets.UTF_8))[0];
+        try (Frame.Parsed parsed = frame) {
+            return json.parse(BufferUtil.toString(parsed.getPayload(), StandardCharsets.UTF_8))[0];
+        }
     }
 
     private ServerMessage receiveHttpMessage(SocketChannel socket, ByteBuffer buffer, JSONContextServer json) throws Exception {

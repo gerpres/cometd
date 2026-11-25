@@ -24,8 +24,7 @@ import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.handler.ContextHandlerCollection;
 import org.eclipse.jetty.ee8.servlet.ServletContextHandler;
 import org.eclipse.jetty.ee8.servlet.ServletHolder;
-import org.eclipse.jetty.util.resource.Resource;
-import org.eclipse.jetty.util.resource.ResourceCollection;
+import org.eclipse.jetty.util.resource.ResourceFactory;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
 
 /**
@@ -65,10 +64,10 @@ public class OortDemo {
         ServletContextHandler context = new ServletContextHandler(contexts, "/", ServletContextHandler.SESSIONS);
         context.addServlet("org.eclipse.jetty.ee8.servlet.DefaultServlet", "/");
 
-        context.setBaseResource(new ResourceCollection(
-                Resource.newResource(base + "/../../cometd-demo/src/main/webapp/"),
-                Resource.newResource(base + "/../../cometd-demo/target/cometd-demo-2.4.0-SNAPSHOT/"))
-        );
+        ResourceFactory resourceFactory = ResourceFactory.of(_server);
+        context.setBaseResource(ResourceFactory.combine(
+                resourceFactory.newResource(base + "/../../cometd-demo/src/main/webapp/"),
+                resourceFactory.newResource(base + "/../../cometd-demo/target/cometd-demo-2.4.0-SNAPSHOT/")));
 
         // CometD servlet
         ServletHolder cometd_holder = new ServletHolder(CometDServlet.class);

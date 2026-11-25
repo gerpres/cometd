@@ -36,6 +36,7 @@ import org.eclipse.jetty.ee8.security.ConstraintMapping;
 import org.eclipse.jetty.ee8.security.ConstraintSecurityHandler;
 import org.eclipse.jetty.security.HashLoginService;
 import org.eclipse.jetty.ee8.security.authentication.BasicAuthenticator;
+import org.eclipse.jetty.util.resource.ResourceFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -54,7 +55,7 @@ public class HandshakeWithAuthenticationTest extends ClientServerTest {
             writer.write(String.format("%s:%s,%s", userName, password, role));
         }
         HashLoginService loginService = new HashLoginService("CometD-Realm");
-        loginService.setConfig(authProps.toString());
+        loginService.setConfig(ResourceFactory.of(server).newResource(authProps));
         server.addBean(loginService);
 
         ConstraintSecurityHandler security = new ConstraintSecurityHandler();

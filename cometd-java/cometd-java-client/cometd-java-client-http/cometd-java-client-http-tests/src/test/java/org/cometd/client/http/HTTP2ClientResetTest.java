@@ -16,6 +16,7 @@
 package org.cometd.client.http;
 
 import java.net.InetSocketAddress;
+import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
@@ -58,17 +59,23 @@ public class HTTP2ClientResetTest extends HTTP2ClientServerTest {
         bayeux.setDetailedDump(true);
 
         Promise.Completable<Session> sessionPromise = new Promise.Completable<>();
-        http2Client.connect(new InetSocketAddress("localhost", connector.getLocalPort()), new Session.Listener.Adapter(), sessionPromise);
+        http2Client.connect(new InetSocketAddress("localhost", connector.getLocalPort()), new Session.Listener() {}, sessionPromise);
         Session session = sessionPromise.get(5, TimeUnit.SECONDS);
 
         CountDownLatch removedLatch = new CountDownLatch(1);
         MetaData.Request request = new MetaData.Request("POST", HttpURI.from(cometdURL), HttpVersion.HTTP_2, HttpFields.EMPTY);
         Promise.Completable<Stream> streamPromise = new Promise.Completable<>();
-        session.newStream(new HeadersFrame(request, null, false), streamPromise, new Stream.Listener.Adapter() {
+        session.newStream(new HeadersFrame(request, null, false), streamPromise, new Stream.Listener() {
             @Override
-            public void onData(Stream stream, DataFrame frame, Callback callback) {
+            public void onHeaders(Stream stream, HeadersFrame frame) {
+                stream.demand();
+            }
+
+            @Override
+            public void onDataAvailable(Stream stream) {
+                Stream.Data data = stream.readData();
                 try {
-                    String json = UTF_8.decode(frame.getData()).toString();
+                    String json = UTF_8.decode(data.frame().getByteBuffer()).toString();
                     Message reply = new JettyJSONContextClient().parse(json)[0];
                     assertEquals(true, reply.get(Message.SUCCESSFUL_FIELD));
                     String sessionId = (String)reply.get(Message.CLIENT_ID_FIELD);
@@ -77,8 +84,10 @@ public class HTTP2ClientResetTest extends HTTP2ClientServerTest {
 
                     // Send a reset to the server.
                     stream.reset(new ResetFrame(stream.getId(), ErrorCode.CANCEL_STREAM_ERROR.code), Callback.NOOP);
-                } catch (Throwable x) {
-                    callback.failed(x);
+                } catch (ParseException x) {
+                    throw new IllegalStateException(x);
+                } finally {
+                    data.release();
                 }
             }
         });
@@ -108,7 +117,7 @@ public class HTTP2ClientResetTest extends HTTP2ClientServerTest {
         bayeux.setDetailedDump(true);
 
         Promise.Completable<Session> sessionPromise = new Promise.Completable<>();
-        http2Client.connect(new InetSocketAddress("localhost", connector.getLocalPort()), new Session.Listener.Adapter(), sessionPromise);
+        http2Client.connect(new InetSocketAddress("localhost", connector.getLocalPort()), new Session.Listener() {}, sessionPromise);
         Session session = sessionPromise.get(5, TimeUnit.SECONDS);
 
         AtomicReference<HttpFields> handshakeResponseRef = new AtomicReference<>();
@@ -116,21 +125,25 @@ public class HTTP2ClientResetTest extends HTTP2ClientServerTest {
         CountDownLatch handshakeLatch = new CountDownLatch(1);
         MetaData.Request request = new MetaData.Request("POST", HttpURI.from(cometdURL), HttpVersion.HTTP_2, HttpFields.EMPTY);
         Promise.Completable<Stream> streamPromise = new Promise.Completable<>();
-        session.newStream(new HeadersFrame(request, null, false), streamPromise, new Stream.Listener.Adapter() {
+        session.newStream(new HeadersFrame(request, null, false), streamPromise, new Stream.Listener() {
             @Override
             public void onHeaders(Stream stream, HeadersFrame frame) {
-                handshakeResponseRef.set(frame.getMetaData().getFields());
+                handshakeResponseRef.set(frame.getMetaData().getHttpFields());
+                stream.demand();
             }
 
             @Override
-            public void onData(Stream stream, DataFrame frame, Callback callback) {
+            public void onDataAvailable(Stream stream) {
+                Stream.Data data = stream.readData();
                 try {
-                    String json = UTF_8.decode(frame.getData()).toString();
+                    String json = UTF_8.decode(data.frame().getByteBuffer()).toString();
                     Message reply = new JettyJSONContextClient().parse(json)[0];
                     handshakeReplyRef.set(reply);
                     handshakeLatch.countDown();
-                } catch (Throwable x) {
-                    callback.failed(x);
+                } catch (ParseException x) {
+                    throw new IllegalStateException(x);
+                } finally {
+                    data.release();
                 }
             }
         });
@@ -154,11 +167,17 @@ public class HTTP2ClientResetTest extends HTTP2ClientServerTest {
         HttpFields headers = HttpFields.build().put(HttpHeader.COOKIE, cookie);
         request = new MetaData.Request("POST", HttpURI.from(cometdURL), HttpVersion.HTTP_2, headers);
         streamPromise = new Promise.Completable<>();
-        session.newStream(new HeadersFrame(request, null, false), streamPromise, new Stream.Listener.Adapter() {
+        session.newStream(new HeadersFrame(request, null, false), streamPromise, new Stream.Listener() {
             @Override
-            public void onData(Stream stream, DataFrame frame, Callback callback) {
+            public void onHeaders(Stream stream, HeadersFrame frame) {
+                stream.demand();
+            }
+
+            @Override
+            public void onDataAvailable(Stream stream) {
+                Stream.Data data = stream.readData();
                 try {
-                    String json = UTF_8.decode(frame.getData()).toString();
+                    String json = UTF_8.decode(data.frame().getByteBuffer()).toString();
                     Message reply = new JettyJSONContextClient().parse(json)[0];
                     assertEquals(true, reply.get(Message.SUCCESSFUL_FIELD));
                     ServerSession cometdSession = bayeux.getSession(sessionId);
@@ -166,8 +185,10 @@ public class HTTP2ClientResetTest extends HTTP2ClientServerTest {
 
                     // Send a reset to the server.
                     stream.reset(new ResetFrame(stream.getId(), ErrorCode.CANCEL_STREAM_ERROR.code), Callback.NOOP);
-                } catch (Throwable x) {
-                    callback.failed(x);
+                } catch (ParseException x) {
+                    throw new IllegalStateException(x);
+                } finally {
+                    data.release();
                 }
             }
         });
@@ -199,7 +220,7 @@ public class HTTP2ClientResetTest extends HTTP2ClientServerTest {
         bayeux.setDetailedDump(true);
 
         Promise.Completable<Session> sessionPromise = new Promise.Completable<>();
-        http2Client.connect(new InetSocketAddress("localhost", connector.getLocalPort()), new Session.Listener.Adapter(), sessionPromise);
+        http2Client.connect(new InetSocketAddress("localhost", connector.getLocalPort()), new Session.Listener() {}, sessionPromise);
         Session session = sessionPromise.get(5, TimeUnit.SECONDS);
 
         AtomicReference<HttpFields> metaHandshakeResponseRef = new AtomicReference<>();
@@ -207,21 +228,25 @@ public class HTTP2ClientResetTest extends HTTP2ClientServerTest {
         CountDownLatch metaHandshakeLatch = new CountDownLatch(1);
         MetaData.Request request = new MetaData.Request("POST", HttpURI.from(cometdURL), HttpVersion.HTTP_2, HttpFields.EMPTY);
         Promise.Completable<Stream> streamPromise = new Promise.Completable<>();
-        session.newStream(new HeadersFrame(request, null, false), streamPromise, new Stream.Listener.Adapter() {
+        session.newStream(new HeadersFrame(request, null, false), streamPromise, new Stream.Listener() {
             @Override
             public void onHeaders(Stream stream, HeadersFrame frame) {
-                metaHandshakeResponseRef.set(frame.getMetaData().getFields());
+                metaHandshakeResponseRef.set(frame.getMetaData().getHttpFields());
+                stream.demand();
             }
 
             @Override
-            public void onData(Stream stream, DataFrame frame, Callback callback) {
+            public void onDataAvailable(Stream stream) {
+                Stream.Data data = stream.readData();
                 try {
-                    String json = UTF_8.decode(frame.getData()).toString();
+                    String json = UTF_8.decode(data.frame().getByteBuffer()).toString();
                     Message reply = new JettyJSONContextClient().parse(json)[0];
                     metaHandshakeReplyRef.set(reply);
                     metaHandshakeLatch.countDown();
-                } catch (Throwable x) {
-                    callback.failed(x);
+                } catch (ParseException x) {
+                    throw new IllegalStateException(x);
+                } finally {
+                    data.release();
                 }
             }
         });
@@ -246,16 +271,24 @@ public class HTTP2ClientResetTest extends HTTP2ClientServerTest {
         HttpFields headers = HttpFields.build().put(HttpHeader.COOKIE, cookie);
         request = new MetaData.Request("POST", HttpURI.from(cometdURL), HttpVersion.HTTP_2, headers);
         streamPromise = new Promise.Completable<>();
-        session.newStream(new HeadersFrame(request, null, false), streamPromise, new Stream.Listener.Adapter() {
+        session.newStream(new HeadersFrame(request, null, false), streamPromise, new Stream.Listener() {
             @Override
-            public void onData(Stream stream, DataFrame frame, Callback callback) {
+            public void onHeaders(Stream stream, HeadersFrame frame) {
+                stream.demand();
+            }
+
+            @Override
+            public void onDataAvailable(Stream stream) {
+                Stream.Data data = stream.readData();
                 try {
-                    String json = UTF_8.decode(frame.getData()).toString();
+                    String json = UTF_8.decode(data.frame().getByteBuffer()).toString();
                     Message reply = new JettyJSONContextClient().parse(json)[0];
                     metaConnectReplyRef.set(reply);
                     metaConnectLatch1.countDown();
-                } catch (Throwable x) {
-                    callback.failed(x);
+                } catch (ParseException x) {
+                    throw new IllegalStateException(x);
+                } finally {
+                    data.release();
                 }
             }
         });
@@ -276,7 +309,7 @@ public class HTTP2ClientResetTest extends HTTP2ClientServerTest {
 
         CountDownLatch metaConnectLatch2 = new CountDownLatch(1);
         streamPromise = new Promise.Completable<>();
-        session.newStream(new HeadersFrame(request, null, false), streamPromise, new Stream.Listener.Adapter() {
+        session.newStream(new HeadersFrame(request, null, false), streamPromise, new Stream.Listener() {
             @Override
             public void onHeaders(Stream stream, HeadersFrame frame) {
                 metaConnectLatch2.countDown();

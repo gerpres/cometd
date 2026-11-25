@@ -15,6 +15,7 @@
  */
 package org.cometd.client.http;
 
+import java.net.HttpCookie;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -32,7 +33,6 @@ import org.cometd.common.JettyJSONContextClient;
 import org.cometd.server.http.AbstractHttpTransport;
 import org.eclipse.jetty.client.ContentResponse;
 import org.eclipse.jetty.client.StringRequestContent;
-import org.eclipse.jetty.http.HttpCookie;
 import org.eclipse.jetty.http.HttpMethod;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.jupiter.api.Assertions;
@@ -329,9 +329,9 @@ public class MultipleClientSessionsTest extends ClientServerTest {
                 .timeout(5, TimeUnit.SECONDS)
                 .send();
         Assertions.assertEquals(200, handshake.getStatus());
-        List<HttpCookie> cookies = httpClient.getCookieStore().match(URI.create(cometdURL));
+        List<org.eclipse.jetty.http.HttpCookie> cookies = httpClient.getHttpCookieStore().match(URI.create(cometdURL));
         Assertions.assertEquals(1, cookies.size());
-        HttpCookie browserCookie = cookies.get(0);
+        org.eclipse.jetty.http.HttpCookie browserCookie = cookies.get(0);
         Assertions.assertEquals("BAYEUX_BROWSER", browserCookie.getName());
         Message.Mutable[] messages = parser.parse(handshake.getContentAsString());
         Assertions.assertEquals(1, messages.length);

@@ -41,7 +41,7 @@ import org.eclipse.jetty.ee8.servlet.FilterHolder;
 import org.eclipse.jetty.ee8.servlet.FilterMapping;
 import org.eclipse.jetty.ee8.servlet.ServletContextHandler;
 import org.eclipse.jetty.ee8.servlet.ServletHandler;
-import org.eclipse.jetty.websocket.servlet.WebSocketUpgradeFilter;
+import org.eclipse.jetty.ee8.websocket.servlet.WebSocketUpgradeFilter;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
@@ -91,7 +91,7 @@ public class RequestRejectedViaResponseHeadersTest extends AbstractClientServerT
 
         switch (transport) {
             case ASYNC_HTTP: {
-                httpClient.getRequestListeners().add(new Request.Listener.Adapter() {
+                httpClient.getRequestListeners().addListener(new Request.Listener() {
                     @Override
                     public void onBegin(Request request) {
                         request.onResponseHeaders(response -> {
@@ -116,7 +116,7 @@ public class RequestRejectedViaResponseHeadersTest extends AbstractClientServerT
                 break;
             }
             case JETTY_WEBSOCKET: {
-                wsClient.addBean(new Request.Listener.Adapter() {
+                wsClient.addBean(new Request.Listener() {
                     @Override
                     public void onBegin(Request request) {
                         request.onResponseHeaders(response -> {

@@ -32,8 +32,6 @@ import org.cometd.client.websocket.javax.WebSocketTransport;
 import org.cometd.client.websocket.jetty.JettyWebSocketTransport;
 import org.cometd.client.websocket.okhttp.OkHttpWebSocketTransport;
 import org.cometd.server.websocket.common.AbstractWebSocketTransport;
-import org.eclipse.jetty.client.HttpRequest;
-import org.eclipse.jetty.client.HttpResponse;
 import org.eclipse.jetty.http.HttpHeader;
 import org.eclipse.jetty.ee8.websocket.client.WebSocketClient;
 import org.junit.jupiter.api.Assertions;
@@ -65,13 +63,13 @@ public class ExtensionNegotiationTest extends ClientServerWebSocketTest {
     protected ClientTransport newJettyWebSocketTransport(String url, Map<String, Object> options, WebSocketClient wsClient) {
         return new JettyWebSocketTransport(url, options, null, wsClient) {
             @Override
-            public void onHandshakeRequest(HttpRequest request) {
+            public void onHandshakeRequest(org.eclipse.jetty.client.Request request) {
                 super.onHandshakeRequest(request);
                 request.headers(headers -> headers.put(HttpHeader.SEC_WEBSOCKET_EXTENSIONS, "identity, fragment"));
             }
 
             @Override
-            public void onHandshakeResponse(HttpRequest request, HttpResponse response) {
+            public void onHandshakeResponse(org.eclipse.jetty.client.Request request, org.eclipse.jetty.client.Response response) {
                 super.onHandshakeResponse(request, response);
                 responseHeaders.putAll(headersToMap(response.getHeaders()));
             }

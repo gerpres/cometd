@@ -27,7 +27,7 @@ import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.ee8.servlet.DefaultServlet;
 import org.eclipse.jetty.ee8.servlet.ServletContextHandler;
 import org.eclipse.jetty.ee8.servlet.ServletHolder;
-import org.eclipse.jetty.util.resource.ResourceCollection;
+import org.eclipse.jetty.util.resource.ResourceFactory;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.eclipse.jetty.ee8.websocket.javax.server.config.JavaxWebSocketServletContainerInitializer;
 import org.junit.jupiter.api.AfterEach;
@@ -112,7 +112,7 @@ public abstract class AbstractCometDTest {
     public void destroyCometDServer() throws Exception {
         destroyPage();
         stopServer();
-        cookieStore.removeAll();
+        cookieStore.clear();
     }
 
     protected void stopServer() throws Exception {
@@ -130,11 +130,11 @@ public abstract class AbstractCometDTest {
         File overlaidScriptDirectory = new File(baseDirectory, "target/test-classes");
         File mainResourcesDirectory = new File(baseDirectory, "src/main/resources");
         File testResourcesDirectory = new File(baseDirectory, "src/test/resources");
-        context.setBaseResource(new ResourceCollection(new String[]{
-                overlaidScriptDirectory.getCanonicalPath(),
-                mainResourcesDirectory.getCanonicalPath(),
-                testResourcesDirectory.getCanonicalPath()
-        }));
+        ResourceFactory resourceFactory = ResourceFactory.of(server);
+        context.setBaseResource(ResourceFactory.combine(
+                resourceFactory.newResource(overlaidScriptDirectory.toPath()),
+                resourceFactory.newResource(mainResourcesDirectory.toPath()),
+                resourceFactory.newResource(testResourcesDirectory.toPath())));
     }
 
     protected void initPage(String transport) throws Exception {
