@@ -28,9 +28,9 @@ import org.cometd.server.CometDServlet;
 import org.eclipse.jetty.jmx.MBeanContainer;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
-import org.eclipse.jetty.servlet.ServletContextHandler;
-import org.eclipse.jetty.servlet.ServletHolder;
-import org.eclipse.jetty.websocket.javax.server.config.JavaxWebSocketServletContainerInitializer;
+import org.eclipse.jetty.ee8.servlet.ServletContextHandler;
+import org.eclipse.jetty.ee8.servlet.ServletHolder;
+import org.eclipse.jetty.ee8.websocket.javax.server.config.JavaxWebSocketServletContainerInitializer;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -50,7 +50,7 @@ public class JMXTest {
         JavaxWebSocketServletContainerInitializer.configure(context, null);
 
         String value = BayeuxServerImpl.ATTRIBUTE + "," + Oort.OORT_ATTRIBUTE + "," + Seti.SETI_ATTRIBUTE;
-        context.setInitParameter(ServletContextHandler.MANAGED_ATTRIBUTES, value);
+        context.setInitParameter(org.eclipse.jetty.server.handler.ContextHandler.MANAGED_ATTRIBUTES, value);
 
         // CometD servlet
         String cometdServletPath = "/cometd";

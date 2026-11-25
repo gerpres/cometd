@@ -30,13 +30,12 @@ import org.cometd.client.BayeuxClient;
 import org.cometd.client.http.jetty.JettyHttpClientTransport;
 import org.cometd.client.transport.ClientTransport;
 import org.cometd.server.BayeuxServerImpl;
-import org.eclipse.jetty.client.api.Request;
-import org.eclipse.jetty.security.ConstraintMapping;
-import org.eclipse.jetty.security.ConstraintSecurityHandler;
+import org.eclipse.jetty.client.Request;
+import org.eclipse.jetty.ee8.nested.ServletConstraint;
+import org.eclipse.jetty.ee8.security.ConstraintMapping;
+import org.eclipse.jetty.ee8.security.ConstraintSecurityHandler;
 import org.eclipse.jetty.security.HashLoginService;
-import org.eclipse.jetty.security.authentication.BasicAuthenticator;
-import org.eclipse.jetty.server.Handler;
-import org.eclipse.jetty.util.security.Constraint;
+import org.eclipse.jetty.ee8.security.authentication.BasicAuthenticator;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -58,12 +57,10 @@ public class HandshakeWithAuthenticationTest extends ClientServerTest {
         loginService.setConfig(authProps.toString());
         server.addBean(loginService);
 
-        Handler handler = server.getHandler();
         ConstraintSecurityHandler security = new ConstraintSecurityHandler();
-        server.setHandler(security);
-        security.setHandler(handler);
+        context.setSecurityHandler(security);
 
-        Constraint constraint = new Constraint();
+        ServletConstraint constraint = new ServletConstraint();
         constraint.setAuthenticate(true);
         constraint.setRoles(new String[]{role});
 

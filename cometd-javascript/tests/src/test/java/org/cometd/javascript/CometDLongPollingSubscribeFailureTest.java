@@ -31,7 +31,7 @@ import org.cometd.bayeux.Promise;
 import org.cometd.bayeux.server.ServerChannel;
 import org.cometd.bayeux.server.ServerMessage;
 import org.cometd.bayeux.server.ServerSession;
-import org.eclipse.jetty.servlet.FilterHolder;
+import org.eclipse.jetty.ee8.servlet.FilterHolder;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

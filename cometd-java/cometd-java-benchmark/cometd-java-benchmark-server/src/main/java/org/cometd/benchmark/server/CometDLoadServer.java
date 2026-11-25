@@ -34,10 +34,12 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
+
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.HdrHistogram.Histogram;
 import org.HdrHistogram.Recorder;
 import org.cometd.bayeux.server.BayeuxServer;
@@ -58,28 +60,29 @@ import org.cometd.server.websocket.common.AbstractWebSocketTransport;
 import org.cometd.server.websocket.javax.WebSocketTransport;
 import org.cometd.server.websocket.jetty.JettyWebSocketTransport;
 import org.eclipse.jetty.alpn.server.ALPNServerConnectionFactory;
+import org.eclipse.jetty.ee8.nested.HandlerWrapper;
+import org.eclipse.jetty.ee8.nested.Request;
+import org.eclipse.jetty.ee8.servlet.DefaultServlet;
+import org.eclipse.jetty.ee8.servlet.ServletContextHandler;
+import org.eclipse.jetty.ee8.servlet.ServletHolder;
+import org.eclipse.jetty.ee8.websocket.javax.server.config.JavaxWebSocketServletContainerInitializer;
 import org.eclipse.jetty.http.HttpHeader;
 import org.eclipse.jetty.http2.server.HTTP2CServerConnectionFactory;
 import org.eclipse.jetty.http2.server.HTTP2ServerConnectionFactory;
 import org.eclipse.jetty.jmx.MBeanContainer;
 import org.eclipse.jetty.server.AbstractConnectionFactory;
 import org.eclipse.jetty.server.ConnectionFactory;
+import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.HttpConfiguration;
 import org.eclipse.jetty.server.HttpConnectionFactory;
-import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
-import org.eclipse.jetty.server.handler.HandlerWrapper;
 import org.eclipse.jetty.server.handler.StatisticsHandler;
-import org.eclipse.jetty.servlet.DefaultServlet;
-import org.eclipse.jetty.servlet.ServletContextHandler;
-import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.toolchain.perf.HistogramSnapshot;
 import org.eclipse.jetty.toolchain.perf.MeasureConverter;
 import org.eclipse.jetty.toolchain.perf.PlatformMonitor;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.util.thread.AutoLock;
-import org.eclipse.jetty.websocket.javax.server.config.JavaxWebSocketServletContainerInitializer;
 
 public class CometDLoadServer {
     private final MonitoringQueuedThreadPool jettyThreadPool = new MonitoringQueuedThreadPool(0);
@@ -306,19 +309,7 @@ public class CometDLoadServer {
         connector.setPort(port);
         server.addConnector(connector);
 
-        HandlerWrapper handler = server;
-
-        if (latencies) {
-            requestLatencyHandler = new RequestLatencyHandler();
-            handler.setHandler(requestLatencyHandler);
-            handler = requestLatencyHandler;
-        }
-
-        if (longRequests) {
-            RequestQoSHandler requestQoSHandler = new RequestQoSHandler();
-            handler.setHandler(requestQoSHandler);
-            handler = requestQoSHandler;
-        }
+        Handler.Wrapper handler = server;
 
         if (statistics) {
             statisticsHandler = new StatisticsHandler();
@@ -329,8 +320,15 @@ public class CometDLoadServer {
         // Add more handlers if needed
 
         ServletContextHandler context = new ServletContextHandler(handler, Config.CONTEXT_PATH, ServletContextHandler.SESSIONS);
+        if (latencies) {
+            requestLatencyHandler = new RequestLatencyHandler();
+            context.insertHandler(requestLatencyHandler);
+        }
+        if (longRequests) {
+            context.insertHandler(new RequestQoSHandler());
+        }
         context.getServletContext().setAttribute(BayeuxServer.ATTRIBUTE, bayeuxServer);
-        context.setInitParameter(ServletContextHandler.MANAGED_ATTRIBUTES, BayeuxServer.ATTRIBUTE);
+        context.setInitParameter(org.eclipse.jetty.server.handler.ContextHandler.MANAGED_ATTRIBUTES, BayeuxServer.ATTRIBUTE);
 
         JavaxWebSocketServletContainerInitializer.configure(context, null);
 
@@ -404,7 +402,7 @@ public class CometDLoadServer {
                     server.cometdThreadPool.reset();
 
                     if (server.statisticsHandler != null) {
-                        server.statisticsHandler.statsReset();
+                        server.statisticsHandler.reset();
                     }
 
                     if (server.requestLatencyHandler != null) {
@@ -428,18 +426,19 @@ public class CometDLoadServer {
                     }
 
                     if (server.statisticsHandler != null) {
-                        int dispatched = server.statisticsHandler.getDispatched();
+                        int dispatched = server.statisticsHandler.getRequestTotal();
+                        long statsOnMs = server.statisticsHandler.getStatisticsDuration().toMillis();
                         if (dispatched > 0) {
                             System.err.printf("Requests times (total/avg/max - stddev): %d/%d/%d ms - %d%n",
-                                    server.statisticsHandler.getDispatchedTimeTotal(),
-                                    ((Double)server.statisticsHandler.getDispatchedTimeMean()).longValue(),
-                                    server.statisticsHandler.getDispatchedTimeMax(),
-                                    ((Double)server.statisticsHandler.getDispatchedTimeStdDev()).longValue());
+                                    server.statisticsHandler.getRequestTimeTotal(),
+                                    (long)server.statisticsHandler.getRequestTimeMean(),
+                                    server.statisticsHandler.getRequestTimeMax(),
+                                    (long)server.statisticsHandler.getRequestTimeStdDev());
                             System.err.printf("Requests (total/failed/max - rate): %d/%d/%d - %d requests/s%n",
                                     dispatched,
                                     server.statisticsHandler.getResponses4xx() + server.statisticsHandler.getResponses5xx(),
-                                    server.statisticsHandler.getDispatchedActiveMax(),
-                                    server.statisticsHandler.getStatsOnMs() == 0 ? -1 : server.statisticsHandler.getDispatched() * 1000L / server.statisticsHandler.getStatsOnMs());
+                                    server.statisticsHandler.getRequestsActiveMax(),
+                                    statsOnMs == 0 ? -1 : dispatched * 1000L / statsOnMs);
                         }
                     }
 

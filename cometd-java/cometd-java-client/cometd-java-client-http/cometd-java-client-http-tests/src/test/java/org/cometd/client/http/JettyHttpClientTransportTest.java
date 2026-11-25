@@ -36,7 +36,7 @@ import org.cometd.client.transport.TransportListener;
 import org.cometd.common.HashMapMessage;
 import org.cometd.common.TransportException;
 import org.eclipse.jetty.client.HttpClient;
-import org.eclipse.jetty.util.HttpCookieStore;
+import org.eclipse.jetty.http.HttpCookieStore;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -109,7 +109,7 @@ public class JettyHttpClientTransportTest {
                 CountDownLatch latch = new CountDownLatch(1);
                 HttpClientTransport transport = new JettyHttpClientTransport(null, httpClient);
                 transport.setURL(serverURL);
-                transport.setCookieStore(new HttpCookieStore());
+                transport.setCookieStore(new HttpCookieStore.Default());
                 transport.init();
 
                 List<Message.Mutable> messages = List.of(new HashMapMessage());
@@ -171,7 +171,7 @@ public class JettyHttpClientTransportTest {
                 HttpClientTransport transport = new JettyHttpClientTransport(null, httpClient);
                 CountDownLatch latch = new CountDownLatch(1);
                 transport.setURL(serverURL);
-                transport.setCookieStore(new HttpCookieStore());
+                transport.setCookieStore(new HttpCookieStore.Default());
                 transport.init();
 
                 long start = System.nanoTime();
@@ -211,7 +211,7 @@ public class JettyHttpClientTransportTest {
             HttpClientTransport transport = new JettyHttpClientTransport(null, httpClient);
             CountDownLatch latch = new CountDownLatch(1);
             transport.setURL(serverURL);
-            transport.setCookieStore(new HttpCookieStore());
+            transport.setCookieStore(new HttpCookieStore.Default());
             transport.init();
 
             transport.send(new TransportListener() {
@@ -256,7 +256,7 @@ public class JettyHttpClientTransportTest {
                 HttpClientTransport transport = new JettyHttpClientTransport(null, httpClient);
                 CountDownLatch latch = new CountDownLatch(1);
                 transport.setURL(serverURL);
-                transport.setCookieStore(new HttpCookieStore());
+                transport.setCookieStore(new HttpCookieStore.Default());
                 transport.init();
 
                 long start = System.nanoTime();
@@ -321,7 +321,7 @@ public class JettyHttpClientTransportTest {
                 HttpClientTransport transport = new JettyHttpClientTransport(options, httpClient);
                 CountDownLatch latch = new CountDownLatch(1);
                 transport.setURL(serverURL);
-                transport.setCookieStore(new HttpCookieStore());
+                transport.setCookieStore(new HttpCookieStore.Default());
                 transport.init();
 
                 transport.send(new TransportListener() {

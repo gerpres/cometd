@@ -16,22 +16,20 @@
 package org.cometd.javascript;
 
 import java.io.File;
-import java.net.CookieStore;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import org.cometd.server.BayeuxServerImpl;
 import org.cometd.server.CometDServlet;
+import org.eclipse.jetty.http.HttpCookieStore;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
-import org.eclipse.jetty.server.handler.HandlerCollection;
-import org.eclipse.jetty.servlet.DefaultServlet;
-import org.eclipse.jetty.servlet.ServletContextHandler;
-import org.eclipse.jetty.servlet.ServletHolder;
-import org.eclipse.jetty.util.HttpCookieStore;
+import org.eclipse.jetty.ee8.servlet.DefaultServlet;
+import org.eclipse.jetty.ee8.servlet.ServletContextHandler;
+import org.eclipse.jetty.ee8.servlet.ServletHolder;
 import org.eclipse.jetty.util.resource.ResourceCollection;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
-import org.eclipse.jetty.websocket.javax.server.config.JavaxWebSocketServletContainerInitializer;
+import org.eclipse.jetty.ee8.websocket.javax.server.config.JavaxWebSocketServletContainerInitializer;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.extension.BeforeTestExecutionCallback;
@@ -42,12 +40,7 @@ public abstract class AbstractCometDTest {
     @RegisterExtension
     final BeforeTestExecutionCallback printMethodName = context ->
             System.err.printf("Running %s.%s() %s%n", context.getRequiredTestClass().getSimpleName(), context.getRequiredTestMethod().getName(), context.getDisplayName());
-    private final CookieStore cookieStore = new HttpCookieStore() {
-        @Override
-        public boolean removeAll() {
-            return false;
-        }
-    };
+    private final HttpCookieStore cookieStore = new HttpCookieStore.Default();
     private final Map<String, String> sessionStore = new HashMap<>();
     protected Server server;
     protected ServerConnector connector;
@@ -81,11 +74,8 @@ public abstract class AbstractCometDTest {
         connector = new ServerConnector(server, 1, 1);
         server.addConnector(connector);
 
-        HandlerCollection handlers = new HandlerCollection();
-        server.setHandler(handlers);
-
         String contextPath = "/cometd";
-        context = new ServletContextHandler(handlers, contextPath, ServletContextHandler.SESSIONS);
+        context = new ServletContextHandler(server, contextPath, ServletContextHandler.SESSIONS);
 
         JavaxWebSocketServletContainerInitializer.configure(context, null);
 

@@ -29,12 +29,12 @@ import org.cometd.client.http.jetty.JettyHttpClientTransport;
 import org.cometd.client.websocket.javax.WebSocketTransport;
 import org.cometd.client.websocket.jetty.JettyWebSocketTransport;
 import org.eclipse.jetty.client.HttpClient;
-import org.eclipse.jetty.client.http.HttpClientTransportOverHTTP;
+import org.eclipse.jetty.client.transport.HttpClientTransportOverHTTP;
+import org.eclipse.jetty.ee8.websocket.client.WebSocketClient;
 import org.eclipse.jetty.io.ClientConnector;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.util.component.LifeCycle;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
-import org.eclipse.jetty.websocket.client.WebSocketClient;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

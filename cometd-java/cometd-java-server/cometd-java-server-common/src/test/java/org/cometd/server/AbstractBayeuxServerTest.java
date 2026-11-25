@@ -20,11 +20,12 @@ import java.util.List;
 import java.util.Map;
 import org.cometd.server.http.AsyncJSONTransport;
 import org.cometd.server.http.JSONTransport;
+import org.eclipse.jetty.ee8.nested.HandlerCollection;
+import org.eclipse.jetty.ee8.servlet.ServletContextHandler;
+import org.eclipse.jetty.ee8.servlet.ServletHolder;
+import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
-import org.eclipse.jetty.server.handler.HandlerCollection;
-import org.eclipse.jetty.servlet.ServletContextHandler;
-import org.eclipse.jetty.servlet.ServletHolder;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.extension.BeforeTestExecutionCallback;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -51,7 +52,7 @@ public abstract class AbstractBayeuxServerTest {
         connector = new ServerConnector(server);
         server.addConnector(connector);
 
-        HandlerCollection handlers = new HandlerCollection();
+        Handler.Sequence handlers = new Handler.Sequence();
         server.setHandler(handlers);
 
         String contextPath = "/cometd";

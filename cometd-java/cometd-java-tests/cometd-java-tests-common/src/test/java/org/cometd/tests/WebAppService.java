@@ -32,7 +32,7 @@ import org.cometd.common.JettyJSONContextClient;
 import org.cometd.server.JettyJSONContextServer;
 import org.eclipse.jetty.client.HttpClient;
 import org.eclipse.jetty.util.ajax.JSON;
-import org.eclipse.jetty.websocket.client.WebSocketClient;
+import org.eclipse.jetty.ee8.websocket.client.WebSocketClient;
 
 @Service
 public class WebAppService {

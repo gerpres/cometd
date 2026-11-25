@@ -18,18 +18,18 @@ package org.cometd.demo;
 import java.lang.management.ManagementFactory;
 import org.cometd.bayeux.server.BayeuxServer;
 import org.cometd.server.CometDServlet;
+import org.eclipse.jetty.ee8.servlet.DefaultServlet;
+import org.eclipse.jetty.ee8.servlet.ServletContextHandler;
+import org.eclipse.jetty.ee8.servlet.ServletHolder;
+import org.eclipse.jetty.ee8.websocket.javax.server.config.JavaxWebSocketServletContainerInitializer;
 import org.eclipse.jetty.jmx.MBeanContainer;
 import org.eclipse.jetty.server.HttpConfiguration;
 import org.eclipse.jetty.server.HttpConnectionFactory;
 import org.eclipse.jetty.server.SecureRequestCustomizer;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
-import org.eclipse.jetty.servlet.DefaultServlet;
-import org.eclipse.jetty.servlet.ServletContextHandler;
-import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
-import org.eclipse.jetty.websocket.javax.server.config.JavaxWebSocketServletContainerInitializer;
 
 public class Demo {
     private static final int HTTP_PORT = 8080;
@@ -86,7 +86,7 @@ public class Demo {
         // Setup JMX.
         MBeanContainer mbeanContainer = new MBeanContainer(ManagementFactory.getPlatformMBeanServer());
         server.addBean(mbeanContainer);
-        context.setInitParameter(ServletContextHandler.MANAGED_ATTRIBUTES, BayeuxServer.ATTRIBUTE);
+        context.setInitParameter(org.eclipse.jetty.server.handler.ContextHandler.MANAGED_ATTRIBUTES, BayeuxServer.ATTRIBUTE);
 
         // Setup the default servlet to serve static files.
         context.addServlet(DefaultServlet.class, "/");

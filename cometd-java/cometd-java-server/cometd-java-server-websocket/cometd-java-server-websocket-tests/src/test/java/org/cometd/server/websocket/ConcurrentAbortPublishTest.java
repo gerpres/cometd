@@ -29,7 +29,7 @@ import org.cometd.client.transport.TransportListener;
 import org.cometd.client.websocket.javax.WebSocketTransport;
 import org.cometd.client.websocket.jetty.JettyWebSocketTransport;
 import org.cometd.client.websocket.okhttp.OkHttpWebSocketTransport;
-import org.eclipse.jetty.websocket.client.WebSocketClient;
+import org.eclipse.jetty.ee8.websocket.client.WebSocketClient;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;

@@ -47,7 +47,7 @@ import org.cometd.client.http.jetty.JettyHttpClientTransport;
 import org.cometd.client.transport.ClientTransport;
 import org.cometd.common.HashMapMessage;
 import org.cometd.server.DefaultSecurityPolicy;
-import org.eclipse.jetty.servlet.FilterHolder;
+import org.eclipse.jetty.ee8.servlet.FilterHolder;
 import org.eclipse.jetty.util.BlockingArrayQueue;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;

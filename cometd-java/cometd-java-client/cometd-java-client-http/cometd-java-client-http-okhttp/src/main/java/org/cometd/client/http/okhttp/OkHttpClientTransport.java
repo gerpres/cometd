@@ -25,6 +25,17 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
+
+import org.cometd.bayeux.Message;
+import org.cometd.bayeux.Promise;
+import org.cometd.client.http.common.AbstractHttpClientTransport;
+import org.cometd.client.transport.ClientTransport;
+import org.cometd.client.transport.TransportListener;
+import org.eclipse.jetty.util.component.ContainerLifeCycle;
+import org.eclipse.jetty.util.thread.AutoLock;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.CookieJar;
@@ -36,15 +47,6 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
-import org.cometd.bayeux.Message;
-import org.cometd.bayeux.Promise;
-import org.cometd.client.http.common.AbstractHttpClientTransport;
-import org.cometd.client.transport.ClientTransport;
-import org.cometd.client.transport.TransportListener;
-import org.eclipse.jetty.util.component.ContainerLifeCycle;
-import org.eclipse.jetty.util.thread.AutoLock;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class OkHttpClientTransport extends AbstractHttpClientTransport {
     private static final Logger LOGGER = LoggerFactory.getLogger(OkHttpClientTransport.class);

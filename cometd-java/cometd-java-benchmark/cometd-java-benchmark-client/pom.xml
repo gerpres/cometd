@@ -86,24 +86,24 @@
       <version>${jetty-version}</version>
     </dependency>
     <dependency>
+      <groupId>org.eclipse.jetty.ee8.websocket</groupId>
+      <artifactId>jetty-ee8-websocket-javax-client</artifactId>
+      <version>${jetty-version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.jetty.ee8.websocket</groupId>
+      <artifactId>jetty-ee8-websocket-jetty-api</artifactId>
+      <version>${jetty-version}</version>
+    </dependency>
+    <dependency>
       <groupId>org.eclipse.jetty.http2</groupId>
-      <artifactId>http2-http-client-transport</artifactId>
+      <artifactId>jetty-http2-client-transport</artifactId>
       <version>${jetty-version}</version>
     </dependency>
     <dependency>
       <groupId>org.eclipse.jetty.toolchain</groupId>
       <artifactId>jetty-javax-websocket-api</artifactId>
       <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.jetty.websocket</groupId>
-      <artifactId>websocket-javax-client</artifactId>
-      <version>${jetty-version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.jetty.websocket</groupId>
-      <artifactId>websocket-jetty-api</artifactId>
-      <version>${jetty-version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>

@@ -62,11 +62,6 @@
     </dependency>
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
-      <artifactId>jetty-servlet</artifactId>
-      <version>${jetty-version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-util</artifactId>
       <version>${jetty-version}</version>
     </dependency>
@@ -76,8 +71,18 @@
       <version>${jetty-version}</version>
     </dependency>
     <dependency>
+      <groupId>org.eclipse.jetty.ee8</groupId>
+      <artifactId>jetty-ee8-servlet</artifactId>
+      <version>${jetty-version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.jetty.ee8.websocket</groupId>
+      <artifactId>jetty-ee8-websocket-javax-server</artifactId>
+      <version>${jetty-version}</version>
+    </dependency>
+    <dependency>
       <groupId>org.eclipse.jetty.http2</groupId>
-      <artifactId>http2-server</artifactId>
+      <artifactId>jetty-http2-server</artifactId>
       <version>${jetty-version}</version>
     </dependency>
     <dependency>
@@ -89,11 +94,6 @@
       <groupId>org.eclipse.jetty.toolchain</groupId>
       <artifactId>jetty-servlet-api</artifactId>
       <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.jetty.websocket</groupId>
-      <artifactId>websocket-javax-server</artifactId>
-      <version>${jetty-version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>

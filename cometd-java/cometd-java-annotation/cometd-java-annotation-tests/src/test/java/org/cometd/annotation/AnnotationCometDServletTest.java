@@ -20,9 +20,8 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import org.cometd.annotation.server.AnnotationCometDServlet;
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.handler.HandlerCollection;
-import org.eclipse.jetty.servlet.ServletContextHandler;
-import org.eclipse.jetty.servlet.ServletHolder;
+import org.eclipse.jetty.ee8.servlet.ServletContextHandler;
+import org.eclipse.jetty.ee8.servlet.ServletHolder;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -31,11 +30,8 @@ public class AnnotationCometDServletTest {
     public void testLifecycle() throws Exception {
         Server server = new Server();
 
-        HandlerCollection handlers = new HandlerCollection();
-        server.setHandler(handlers);
-
         String contextPath = "/cometd";
-        ServletContextHandler context = new ServletContextHandler(handlers, contextPath, ServletContextHandler.SESSIONS);
+        ServletContextHandler context = new ServletContextHandler(server, contextPath, ServletContextHandler.SESSIONS);
 
         AnnotationCometDServlet cometdServlet = new AnnotationCometDServlet();
         ServletHolder cometdServletHolder = new ServletHolder(cometdServlet);

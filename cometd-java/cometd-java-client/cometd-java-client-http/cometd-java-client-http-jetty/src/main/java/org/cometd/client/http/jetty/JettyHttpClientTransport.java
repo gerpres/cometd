@@ -36,10 +36,10 @@ import org.cometd.client.transport.TransportListener;
 import org.cometd.common.BufferingJSONAsyncParser;
 import org.cometd.common.JSONContext;
 import org.eclipse.jetty.client.HttpClient;
-import org.eclipse.jetty.client.api.Request;
-import org.eclipse.jetty.client.api.Response;
-import org.eclipse.jetty.client.api.Result;
-import org.eclipse.jetty.client.util.StringRequestContent;
+import org.eclipse.jetty.client.Request;
+import org.eclipse.jetty.client.Response;
+import org.eclipse.jetty.client.Result;
+import org.eclipse.jetty.client.StringRequestContent;
 import org.eclipse.jetty.http.HttpField;
 import org.eclipse.jetty.http.HttpHeader;
 import org.eclipse.jetty.http.HttpMethod;
@@ -127,7 +127,7 @@ public class JettyHttpClientTransport extends AbstractHttpClientTransport {
     }
 
     private void send(TransportListener listener, List<Message.Mutable> messages, URI cookieURI, Request request) {
-        request.listener(new Request.Listener.Adapter() {
+        request.listener(new Request.Listener() {
             @Override
             public void onHeaders(Request request) {
                 listener.onSending(messages);
