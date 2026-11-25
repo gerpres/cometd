@@ -15,12 +15,12 @@
  */
 package org.cometd.server;
 
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.jetty.client.ContentResponse;
 import org.eclipse.jetty.client.FutureResponseListener;
 import org.eclipse.jetty.client.Request;
+import org.eclipse.jetty.http.HttpStatus;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -70,11 +70,8 @@ public class ServerShutdownTest extends AbstractBayeuxClientServerTest {
         server.stop();
         server.join();
 
-        // Expect the connect to be back with an exception
-        try {
-            futureResponse.get(timeout * 2, TimeUnit.SECONDS);
-            Assertions.fail();
-        } catch (ExecutionException expected) {
-        }
+        // Expect the connect to return a 500 response.
+        response = futureResponse.get(timeout * 2, TimeUnit.SECONDS);
+        Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR_500, response.getStatus());
     }
 }

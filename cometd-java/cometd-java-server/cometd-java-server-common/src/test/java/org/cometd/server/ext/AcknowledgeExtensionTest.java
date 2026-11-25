@@ -81,7 +81,7 @@ public class AcknowledgeExtensionTest extends AbstractBayeuxClientServerTest {
         // Wait for the long poll.
         Thread.sleep(1000);
 
-        // Stop the connector so a server-side publish will get lost.
+        // Stop the connector so a server-side publish will not be delivered.
         int port = connector.getLocalPort();
         connector.stop();
         // Wait to process the close.
@@ -89,13 +89,12 @@ public class AcknowledgeExtensionTest extends AbstractBayeuxClientServerTest {
 
         ServerSessionImpl session = (ServerSessionImpl)bayeux.getSession(clientId);
 
-        // Publish the message; it will get lost but the
-        // ack extension will track it and resend it later.
+        // Publish the message; the ack extension will track it and resend it later.
         String data = "data";
         bayeux.getChannel(channel).publish(null, data, Promise.noop());
         // Wait for the message to be lost.
         Thread.sleep(1000);
-        Assertions.assertEquals(0, session.getQueue().size());
+        Assertions.assertEquals(1, session.getQueue().size());
 
         connector.setPort(port);
         connector.start();
