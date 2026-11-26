@@ -94,6 +94,7 @@ public class WebAppTest {
         copyWebAppDependency(org.apache.logging.log4j.core.LoggerContext.class, webINF);
         copyWebAppDependency(org.cometd.annotation.Service.class, webINF);
         copyWebAppDependency(org.cometd.annotation.server.RemoteCall.class, webINF);
+        copyWebAppDependency(org.cometd.annotation.server.AnnotationCometDServlet.class, webINF);
         copyWebAppDependency(org.cometd.bayeux.Message.class, webINF);
         copyWebAppDependency(org.cometd.bayeux.client.ClientSession.class, webINF);
         copyWebAppDependency(org.cometd.bayeux.server.BayeuxServer.class, webINF);
@@ -162,6 +163,12 @@ public class WebAppTest {
         addServerDependency(org.eclipse.jetty.server.Server.class, serverClassPath);
         addServerDependency(org.eclipse.jetty.ee8.servlet.ServletContextHandler.class, serverClassPath);
         addServerDependency(org.eclipse.jetty.util.Callback.class, serverClassPath);
+        addServerDependency(org.eclipse.jetty.ee8.nested.ContextHandler.class, serverClassPath);
+        addServerDependency(org.eclipse.jetty.ee8.security.ConstraintSecurityHandler.class, serverClassPath);
+        addServerDependency(org.eclipse.jetty.session.SessionManager.class, serverClassPath);
+        addServerDependency(org.eclipse.jetty.util.ajax.JSON.class, serverClassPath);
+        addServerDependency(org.eclipse.jetty.ee.WebAppClassLoading.class, serverClassPath);
+        addServerDependency(org.eclipse.jetty.plus.jndi.Transaction.class, serverClassPath);
         addServerDependency(org.eclipse.jetty.ee8.webapp.WebAppContext.class, serverClassPath);
         addServerDependency(org.eclipse.jetty.ee8.websocket.api.Session.class, serverClassPath);
         addServerDependency(org.eclipse.jetty.ee8.websocket.common.WebSocketSession.class, serverClassPath);
