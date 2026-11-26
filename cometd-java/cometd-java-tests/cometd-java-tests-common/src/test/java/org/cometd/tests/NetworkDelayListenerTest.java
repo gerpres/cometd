@@ -45,6 +45,7 @@ import org.eclipse.jetty.http.HttpField;
 import org.eclipse.jetty.http.HttpFields;
 import org.eclipse.jetty.http.HttpHeader;
 import org.eclipse.jetty.http.HttpParser;
+import org.eclipse.jetty.http.HttpTester;
 import org.eclipse.jetty.http.HttpVersion;
 import org.eclipse.jetty.io.ArrayByteBufferPool;
 import org.eclipse.jetty.util.BufferUtil;
@@ -339,59 +340,4 @@ public class NetworkDelayListenerTest extends AbstractClientServerTest {
         return transport == Transport.JAVAX_WEBSOCKET || transport == Transport.JETTY_WEBSOCKET || transport == Transport.OKHTTP_WEBSOCKET;
     }
 
-    // TODO: remove this class once jetty-http-tools is deployed to Central.
-    private static class HttpTester {
-        private static class Request implements HttpParser.RequestHandler {
-            private final HttpFields.Mutable headers = HttpFields.build();
-            private final Utf8StringBuilder content = new Utf8StringBuilder();
-            private boolean complete;
-
-            @Override
-            public void startRequest(String method, String uri, HttpVersion version) {
-            }
-
-            @Override
-            public void parsedHeader(HttpField field) {
-                headers.put(field);
-            }
-
-            @Override
-            public boolean headerComplete() {
-                return false;
-            }
-
-            @Override
-            public boolean content(ByteBuffer buffer) {
-                content.append(buffer);
-                return false;
-            }
-
-            @Override
-            public boolean contentComplete() {
-                return false;
-            }
-
-            @Override
-            public boolean messageComplete() {
-                complete = true;
-                return true;
-            }
-
-            @Override
-            public void earlyEOF() {
-            }
-
-            public String get(HttpHeader header) {
-                return headers.get(header);
-            }
-
-            public boolean isComplete() {
-                return complete;
-            }
-
-            public String getContent() {
-                return content.toString();
-            }
-        }
-    }
 }
